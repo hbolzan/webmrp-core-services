@@ -1,0 +1,2 @@
+WEB_SERVER_ADDRESS: 0.0.0.0:9001
+AMQP_URI: amqp://guest:guest@localhost
