@@ -1,9 +1,13 @@
 import json
 from nameko.web.handlers import HttpRequestHandler
 from nameko.rpc import RpcProxy
-from config import version
-from controllers.generic import handle_request
+from .config import version
+from .controllers.generic import handle_request
 
+
+def json_to_data(request):
+    if request.mimetype == "application/json":
+        return json.loads(request.data)
 
 class CorsHttpRequestHandler(HttpRequestHandler):
     def handle_request(self, request):
@@ -18,6 +22,7 @@ class CorsHttpRequestHandler(HttpRequestHandler):
         response.headers.add("Access-Control-Allow-Methods", "*")
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
+
 
 cors_http = CorsHttpRequestHandler.decorator
 
@@ -37,4 +42,21 @@ class HttpService:
 
     @cors_http("GET", "/api/data/<string:provider>/<string:source>")
     def get_data(self, request, provider, source):
-        return handle_request(lambda: self.data_hub.query(provider, source, {}))
+        return handle_request(lambda: self.data_hub.query(provider, source, request.args))
+
+    @cors_http("GET", "/api/data/<string:provider>/<string:source>/<string:key>")
+    def get_data(self, request, provider, source, key):
+        return handle_request(lambda: self.data_hub.get_one(provider, source, key))
+
+    @cors_http("POST", "/api/data/<string:provider>/<string:source>")
+    def post_data(self, request, provider, source):
+        print(json_to_data(request))
+        return handle_request(lambda: self.data_hub.append(provider, source, json_to_data(request)))
+
+    @cors_http("PUT", "/api/data/<string:provider>/<string:source>/<string:key>")
+    def put_data(self, request, provider, source, key):
+        return handle_request(lambda: self.data_hub.edit(provider, source, key, json_to_data(request)))
+
+    @cors_http("DELETE", "/api/data/<string:provider>/<string:source>/<string:key>")
+    def delete_data(self, request, provider, source, key):
+        return handle_request(lambda: self.data_hub.delete(provider, source, key))
