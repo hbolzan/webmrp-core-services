@@ -5,14 +5,12 @@ class NotFound(Exception):
 
 class DataHubService:
     name = "data-hub"
-    providers = {
-        "legacy": RpcProxy("legacy"),
-    }
+    legacy = RpcProxy("legacy")
 
     def provider(self, provider_name):
         try:
-            return self.providers[provider_name]
-        except KeyError:
+            return getattr(self, provider_name)
+        except AttributeError:
             raise NotFound
 
     @rpc

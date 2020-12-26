@@ -40,23 +40,19 @@ class HttpService:
     def get_form(self, request, name):
         return handle_request(lambda: self.forms.form(name))
 
-    @cors_http("GET", "/api/data/<string:provider>/<string:source>")
-    def get_data(self, request, provider, source):
-        return handle_request(lambda: self.data_hub.query(provider, source, request.args))
+    @cors_http("GET,POST", "/api/data/<string:provider>/<string:source>")
+    def data__methods(self, request, provider, source):
+        methods = {
+            "GET": lambda: self.data_hub.query(provider, source, request.args),
+            "POST": lambda: self.data_hub.append(provider, source, json_to_data(request)),
+        }
+        return handle_request(methods.get(request.method))
 
-    @cors_http("GET", "/api/data/<string:provider>/<string:source>/<string:key>")
-    def get_data(self, request, provider, source, key):
-        return handle_request(lambda: self.data_hub.get_one(provider, source, key))
-
-    @cors_http("POST", "/api/data/<string:provider>/<string:source>")
-    def post_data(self, request, provider, source):
-        print(json_to_data(request))
-        return handle_request(lambda: self.data_hub.append(provider, source, json_to_data(request)))
-
-    @cors_http("PUT", "/api/data/<string:provider>/<string:source>/<string:key>")
-    def put_data(self, request, provider, source, key):
-        return handle_request(lambda: self.data_hub.edit(provider, source, key, json_to_data(request)))
-
-    @cors_http("DELETE", "/api/data/<string:provider>/<string:source>/<string:key>")
-    def delete_data(self, request, provider, source, key):
-        return handle_request(lambda: self.data_hub.delete(provider, source, key))
+    @cors_http("GET,PUT,DELETE", "/api/data/<string:provider>/<string:source>/<string:key>")
+    def data_one__methods(self, request, provider, source, key):
+        methods = {
+            "GET": lambda: lambda: self.data_hub.get_one(provider, source, key),
+            "PUT": lambda: lambda: self.data_hub.edit(provider, source, key, json_to_data(request)),
+            "DELETE": lambda: self.data_hub.delete(provider, source, key),
+        }
+        return handle_request(methods.get(request.method))

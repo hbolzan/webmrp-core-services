@@ -1,18 +1,20 @@
-import os
 import json
+from urllib import request
 from nameko.rpc import rpc
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
+
+postgrest_base_url = "http://localhost:3000"
 
 class NotFound(Exception):
     pass
 
-class FormsService:
+class LegacyService:
     name = "legacy"
 
     @rpc
     def query(self, source, params):
-        pass
+        with request.urlopen("{}/{}".format(postgrest_base_url, source)) as resp:
+            return {"data": json.loads(resp.read())}
 
     @rpc
     def get_one(self, source, key):
