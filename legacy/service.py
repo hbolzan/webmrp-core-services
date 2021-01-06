@@ -18,7 +18,12 @@ class LegacyService:
 
     @rpc
     def get_one(self, source, key):
-        pass
+        url = "{}/{}?id=eq.{}".format(postgrest_base_url, source, key)
+        with request.urlopen("{}/{}/?id=eq.{}".format(postgrest_base_url, source, key)) as resp:
+            try:
+                return {"data": json.loads(resp.read())[0]}
+            except IndexError:
+                raise NotFound
 
     @rpc
     def append(self, source, data):

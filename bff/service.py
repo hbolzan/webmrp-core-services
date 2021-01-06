@@ -51,8 +51,8 @@ class HttpService:
     @cors_http("GET,PUT,DELETE", "/api/data/<string:provider>/<string:source>/<string:key>")
     def data_one__methods(self, request, provider, source, key):
         methods = {
-            "GET": lambda: lambda: self.data_hub.get_one(provider, source, key),
-            "PUT": lambda: lambda: self.data_hub.edit(provider, source, key, json_to_data(request)),
+            "GET": lambda: self.data_hub.get_one(provider, source, key),
+            "PUT": lambda: self.data_hub.edit(provider, source, key, json_to_data(request)),
             "DELETE": lambda: self.data_hub.delete(provider, source, key),
         }
         return handle_request(methods.get(request.method))
