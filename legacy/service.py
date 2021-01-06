@@ -1,9 +1,18 @@
 import json
 from urllib import request
 from nameko.rpc import rpc
+from .legacy_data_index import data_index
 
 
 postgrest_base_url = "http://localhost:3000"
+
+
+def from_index(source_name):
+    try:
+        return data_index[source_name]["singular"], data_index[source_name]["source"]
+    except KeyError:
+        return source_name, source_name
+
 
 class NotFound(Exception):
     pass
@@ -18,10 +27,10 @@ class LegacyService:
 
     @rpc
     def get_one(self, source, key):
-        url = "{}/{}?id=eq.{}".format(postgrest_base_url, source, key)
-        with request.urlopen("{}/{}/?id=eq.{}".format(postgrest_base_url, source, key)) as resp:
+        namespace, table_name = from_index(source)
+        with request.urlopen("{}/{}?id=eq.{}".format(postgrest_base_url, table_name, key)) as resp:
             try:
-                return {"data": json.loads(resp.read())[0]}
+                return {namespace: json.loads(resp.read())[0]}
             except IndexError:
                 raise NotFound
 
