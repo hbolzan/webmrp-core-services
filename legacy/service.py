@@ -30,7 +30,7 @@ class LegacyService:
         namespace, table_name = from_index(source)
         with request.urlopen("{}/{}?id=eq.{}".format(postgrest_base_url, table_name, key)) as resp:
             try:
-                return {namespace: json.loads(resp.read())[0]}
+                return {"data": json.loads(resp.read())}
             except IndexError:
                 raise NotFound
 
