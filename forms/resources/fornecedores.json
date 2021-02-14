@@ -3,7 +3,7 @@
         {
             "id":"cad-fornecedores",
             "dataset-name":"view_nfe_fornecedores",
-            "search-fields":"id,cnpj,cpf,inscricao_estadual,apelido,razao_social,dados_adicionais,cep,nome_do_logradouro",
+            "search-fields":"cnpj,cpf,inscricao_estadual,apelido,razaosocial,dados_adicionais,cep,nome_do_logradouro",
             "title":"Cadastro de fornecedores",
             "pk-fields":["id"],
             "auto-pk":true,
