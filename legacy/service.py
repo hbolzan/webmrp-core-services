@@ -1,41 +1,20 @@
 import os
-import json
 from urllib import request
 from nameko.rpc import rpc
 from .settings import databases
-from .connection import Transaction
+from .components.connection import Transaction
+from .controllers import resources
 from .logic import query
-from .legacy_data_index import data_index
+from .logic import response
+from .legacy_resources import resources_index
 
 
-postgrest_base_url = "http://localhost:3000"
-transaction = Transaction(databases.default)
-root_path = os.path.dirname(os.path.realpath(__file__))
+ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
+default_select = lambda resource_name: "select * from {}".format(resource_name) + " {where} {order_by}"
+
+transaction = Transaction(databases["default"])
 
 
-def from_index(source_name):
-    try:
-        return data_index[source_name]["singular"], data_index[source_name]["source"]
-    except KeyError:
-        return source_name, source_name
-
-
-def paramsToSearchFields(params):
-    return params.get("searchFields").split(",")
-
-
-def paramsToSearchValue(params):
-    return params.get("searchValue")
-
-def where(params):
-    return " or ".join(
-        list(map(
-            lambda f: "cast({} as varchar) ilike '%{}%'".format(f, paramsToSearchValue(params)),
-            paramsToSearchFields(params)
-        ))
-    )
-
-g
 class NotFound(Exception):
     pass
 
@@ -44,17 +23,23 @@ class LegacyService:
     name = "legacy"
 
     @rpc
-    def query(self, source, params):
-        return transaction.query(query.select(source, where(params)))
+    def query(self, resource_name, params):
+        return response.to_response(transaction.query(
+            resources.resource_to_sql(ROOT_PATH, resource_name, default_select(resource_name)).format(
+                where=query.where(query.params_to_search_where(params)),
+                order_by=""
+            )
+        ))
 
     @rpc
-    def get_one(self, source, key):
-        namespace, table_name = from_index(source)
-        with request.urlopen("{}/{}?id=eq.{}".format(postgrest_base_url, table_name, key)) as resp:
-            try:
-                return {"data": json.loads(resp.read())}
-            except IndexError:
-                raise NotFound
+    def get_one(self, resource_name, key):
+        namespace, table_name, pk = query.from_index(resources_index, resource_name)
+        return response.to_response(transaction.query(
+            resources.resource_to_sql(ROOT_PATH, resource_name, default_select(resource_name)).format(
+                where=query.where("{}={}".format(pk, key)),
+                order_by=""
+            )
+        ))
 
     @rpc
     def append(self, source, data):

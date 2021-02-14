@@ -12,7 +12,7 @@ class Transaction:
     def query(self, sql):
         with self.conn_fn().cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute(sql)
-            return json.dumps(c.fetchall())
+            return c.fetchall()
 
 
 class Connection:
@@ -30,14 +30,11 @@ class Connection:
         return hashlib.md5(s.encode()).hexdigest()
 
     def live_connection(self, conn, hash, params):
-        return conn if self.alive(conn) else self.connect(hash, params)
-
-    def alive(self, conn):
         try:
             conn.isolation_level
-            return true
+            return conn
         except psycopg2.OperationalError:
-            return false
+            return self.connect(hash, params)
 
     def connect(self, hash, params):
         self.connections[hash] = psycopg2.connect(**params)
