@@ -28,7 +28,7 @@ def params_to_search_where(params):
     return " or ".join(
         list(map(
             lambda f: "cast({} as varchar) ilike '%{}%'".format(f, params.get("searchValue")),
-            params.get("searchFields").split(",")
+            filter(lambda x: x, params.get("searchFields", "").split(","))
         ))
     )
 

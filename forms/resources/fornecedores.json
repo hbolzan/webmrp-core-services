@@ -412,6 +412,12 @@
                     "name":"pais",
                     "label":"País",
                     "field-kind":"x-lookup",
+                    "x-lookup": {
+                        "visible-field": "pais_nome",
+                        "source": "legacy/nfebase.paises",
+                        "key": "codigo",
+                        "result": "nome"
+                    },
                     "required":false,
                     "visible":true,
                     "search-visible":false,
@@ -422,9 +428,6 @@
                     "default":"1058",
                     "size":60,
                     "width":28,
-                    "lookup-key":"codigo",
-                    "lookup-result":"nome",
-                    "lookup-filter":"",
                     "validation":null,
                     "search-result?":false,
                     "line-break?":true,
