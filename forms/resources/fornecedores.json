@@ -2,7 +2,7 @@
     "data":[
         {
             "id":"cad-fornecedores",
-            "dataset-name":"view_nfe_fornecedores",
+            "dataset-name":"legacy.fornecedores",
             "search-fields":"cnpj,cpf,inscricao_estadual,apelido,razaosocial,dados_adicionais,cep,nome_do_logradouro",
             "title":"Cadastro de fornecedores",
             "pk-fields":["id"],
@@ -408,13 +408,37 @@
                     "search-result-order":null
                 },
                 {
+                    "order":22,
+                    "name":"pais_nome",
+                    "label":"pais_nome",
+                    "field-kind":"data",
+                    "required":false,
+                    "visible":false,
+                    "search-visible":false,
+                    "read-only":false,
+                    "persistent?":true,
+                    "data-type":"char",
+                    "alignment":"default",
+                    "default":null,
+                    "size":60,
+                    "width":60,
+                    "lookup-key":"",
+                    "lookup-result":"",
+                    "lookup-filter":"",
+                    "validation":null,
+                    "search-result?":false,
+                    "line-break?":false,
+                    "additional-params":{},
+                    "search-result-order":null
+                },
+                {
                     "order":23,
                     "name":"pais",
                     "label":"País",
                     "field-kind":"x-lookup",
-                    "x-lookup": {
-                        "visible-field": "pais_nome",
-                        "source": "legacy/nfebase.paises",
+                    "xLookup": {
+                        "displayField": "pais_nome",
+                        "source": "legacy.paises",
                         "key": "codigo",
                         "result": "nome"
                     },
@@ -432,10 +456,7 @@
                     "search-result?":false,
                     "line-break?":true,
                     "additional-params":{},
-                    "search-result-order":null,
-                    "options":[
-                        
-                    ]
+                    "search-result-order":null
                 },
                 {
                     "order":24,
@@ -592,10 +613,40 @@
                     ]
                 },
                 {
+                    "order":27,
+                    "name":"municipio_nome",
+                    "label":"municipio_nome",
+                    "field-kind":"data",
+                    "required":false,
+                    "visible":false,
+                    "search-visible":false,
+                    "read-only":false,
+                    "persistent?":true,
+                    "data-type":"char",
+                    "alignment":"default",
+                    "default":null,
+                    "size":80,
+                    "width":80,
+                    "lookup-key":"",
+                    "lookup-result":"",
+                    "lookup-filter":"",
+                    "validation":null,
+                    "search-result?":false,
+                    "line-break?":false,
+                    "additional-params":{},
+                    "search-result-order":null
+                },
+                {
                     "order":28,
                     "name":"ibge_municipio",
                     "label":"Município",
                     "field-kind":"x-lookup",
+                    "xLookup": {
+                        "displayField": "municipio_nome",
+                        "source": "legacy.municipios",
+                        "key": "codigo",
+                        "result": "nome"
+                    },
                     "required":false,
                     "visible":true,
                     "search-visible":false,
@@ -613,10 +664,7 @@
                     "search-result?":false,
                     "line-break?":false,
                     "additional-params":{},
-                    "search-result-order":null,
-                    "options":[
-                        
-                    ]
+                    "search-result-order":null
                 },
                 {
                     "order":29,
