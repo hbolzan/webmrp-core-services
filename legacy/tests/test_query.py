@@ -20,6 +20,7 @@ class BuildQueryTests(unittest.TestCase):
         self.assertEqual(query.default_select("items", "", "z"), "select * from items order by z")
 
     def test_params_to_search_where(self):
+        self.assertEqual(query.params_to_search_where({}), "")
         self.assertEqual(
             query.params_to_search_where({"searchValue": "xyz", "searchFields": "a,b,c"}),
             "cast(a as varchar) ilike '%xyz%' or cast(b as varchar) ilike '%xyz%' or cast(c as varchar) ilike '%xyz%'"

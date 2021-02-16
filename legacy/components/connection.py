@@ -10,9 +10,14 @@ class Transaction:
         self.conn_fn = lambda : connection.connection(params)
 
     def query(self, sql):
-        with self.conn_fn().cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
-            c.execute(sql)
-            return c.fetchall()
+        conn = self.conn_fn()
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute(sql)
+                return c.fetchall()
+        except:
+            conn.rollback()
+            raise
 
 
 class Connection:
