@@ -24,13 +24,34 @@ def order_by(order):
     return "" if (not order) else "order by {}".format(order)
 
 
-def params_to_search_where(params):
+def to_filter(params):
+    return " and ".join(
+        map(
+            lambda filter_by, filter_with: "cast({} as varchar) = '{}'".format(filter_by, filter_with),
+            params.get("filterBy").split(","), params.get("filterWith").split(",")
+        )
+    )
+
+
+def params_to_filter(params):
+    return "" if not params.get("filterBy") else to_filter(params)
+
+
+def to_search_condition(params):
     return " or ".join(
         list(map(
             lambda f: "cast({} as varchar) ilike '%{}%'".format(f, params.get("searchValue")),
             filter(lambda x: x, params.get("searchFields", "").split(","))
         ))
     )
+
+
+def params_to_search_condition(params):
+    search_filter = params_to_filter(params)
+    search_condition = to_search_condition(params)
+    if search_filter and search_condition:
+        return "({}) and ({})".format(search_filter, search_condition)
+    return search_filter or search_condition
 
 
 def from_index(data_index, source_name):

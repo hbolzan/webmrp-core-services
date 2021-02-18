@@ -26,7 +26,7 @@ class LegacyService:
     def query(self, resource_name, params):
         return response.to_response(transaction.query(
             resources.resource_to_sql(ROOT_PATH, resource_name, default_select(resource_name)).format(
-                where=query.where(query.params_to_search_where(params)),
+                where=query.where(query.params_to_search_condition(params)),
                 order_by=""
             )
         ))

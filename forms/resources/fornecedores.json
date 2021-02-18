@@ -3,7 +3,7 @@
         {
             "id":"cad-fornecedores",
             "dataset-name":"legacy.fornecedores",
-            "search-fields":"cnpj,cpf,inscricao_estadual,apelido,razaosocial,dados_adicionais,cep,nome_do_logradouro",
+            "search-fields":"frn.id,cnpj,cpf,inscricao_estadual,apelido,razaosocial,dados_adicionais,cep,nome_do_logradouro",
             "title":"Cadastro de fornecedores",
             "pk-fields":["id"],
             "auto-pk":true,
@@ -480,9 +480,7 @@
                         "service":"common_validations",
                         "method":"cep",
                         "single-argument":null,
-                        "named-arguments":{
-                            
-                        },
+                        "named-arguments":{},
                         "expected-results":{
                             "nome_do_logradouro":"subject_data.logradouro",
                             "bairro":"subject_data.bairro",
@@ -645,7 +643,11 @@
                         "displayField": "municipio_nome",
                         "source": "legacy.municipios",
                         "key": "codigo",
-                        "result": "nome"
+                        "result": "nome",
+                        "filter": {
+                            "by": "uf",
+                            "with": "uf"
+                        }
                     },
                     "required":false,
                     "visible":true,
@@ -657,9 +659,6 @@
                     "default":null,
                     "size":80,
                     "width":28,
-                    "lookup-key":"municipiocodigo",
-                    "lookup-result":"municipionome",
-                    "lookup-filter":"uf;ufsigla",
                     "validation":null,
                     "search-result?":false,
                     "line-break?":false,
