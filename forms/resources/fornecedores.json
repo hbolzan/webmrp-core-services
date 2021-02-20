@@ -477,18 +477,17 @@
                     "lookup-result":"",
                     "lookup-filter":"",
                     "validation":{
-                        "service":"common_validations",
-                        "method":"cep",
-                        "single-argument":null,
-                        "named-arguments":{},
-                        "expected-results":{
-                            "nome_do_logradouro":"subject_data.logradouro",
-                            "bairro":"subject_data.bairro",
-                            "uf":"subject_data.uf",
-                            "ibge_municipio":"subject_data.ibge"
+                        "source":"common.cep",
+                        "httpMethod":"PUT",
+                        "additionalArguments": [],
+                        "resultAssignments":{
+                            "nome_do_logradouro":"logradouro",
+                            "bairro":"bairro",
+                            "uf":"uf",
+                            "ibge_municipio":"ibge"
                         },
-                        "show-message-on-error":true,
-                        "before-validate":null
+                        "showMessageOnError":true,
+                        "beforeValidate":null
                     },
                     "search-result?":false,
                     "line-break?":false,
@@ -625,9 +624,6 @@
                     "default":null,
                     "size":80,
                     "width":80,
-                    "lookup-key":"",
-                    "lookup-result":"",
-                    "lookup-filter":"",
                     "validation":null,
                     "search-result?":false,
                     "line-break?":false,
