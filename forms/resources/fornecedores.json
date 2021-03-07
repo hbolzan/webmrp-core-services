@@ -117,7 +117,7 @@
                     "lookup-key":"",
                     "lookup-result":"",
                     "lookup-filter":"",
-                    "validation":{
+                    "_validation":{
                         "service":"common_validations",
                         "method":"cnpj",
                         "single-argument":null,
@@ -163,7 +163,7 @@
                     "lookup-key":"",
                     "lookup-result":"",
                     "lookup-filter":"",
-                    "validation":{
+                    "_validation":{
                         "service":"common_validations",
                         "method":"cpf",
                         "single-argument":"cpf",
@@ -477,17 +477,23 @@
                     "lookup-result":"",
                     "lookup-filter":"",
                     "validation":{
-                        "source":"common.cep",
-                        "httpMethod":"PUT",
-                        "additionalArguments": [],
-                        "resultAssignments":{
-                            "nome_do_logradouro":"logradouro",
-                            "bairro":"bairro",
-                            "uf":"uf",
-                            "ibge_municipio":"ibge"
-                        },
-                        "showMessageOnError":true,
-                        "beforeValidate":null
+                        "source":"common_validations.cep",
+                        "httpMethod":"GET",
+                        "additionalArguments":null,
+                        "beforeValidate":null,
+                        "handling":{
+                            "valid":{"status": 200},
+                            "showMessageOnError":true,
+                            "messagesPath":"data.messages",
+                            "assignmentsPath":"data.additional_information.subject_data",
+                            "assignments":[
+                                {"destination": "nome_do_logradouro", "origin": "logradouro"},
+                                {"destination": "bairro", "origin": "bairro"},
+                                {"destination": "uf", "origin": "uf"},
+                                {"destination": "municipio_nome", "origin": "localidade"},
+                                {"destination": "ibge_municipio", "origin": "ibge"}
+                            ]
+                        }
                     },
                     "search-result?":false,
                     "line-break?":false,
@@ -970,132 +976,6 @@
                         
                     },
                     "search-result-order":null
-                }
-            ],
-            "search-columns":[
-                {
-                    "order":10,
-                    "name":"apelido",
-                    "label":"Apelido",
-                    "field-kind":"data",
-                    "required":false,
-                    "visible":true,
-                    "search-visible":true,
-                    "read-only":false,
-                    "persistent?":true,
-                    "data-type":"char",
-                    "alignment":"default",
-                    "default":null,
-                    "size":50,
-                    "width":15,
-                    "lookup-key":"",
-                    "lookup-result":"",
-                    "lookup-filter":"",
-                    "validation":null,
-                    "search-result?":true,
-                    "line-break?":true,
-                    "additional-params":{
-                        
-                    },
-                    "search-result-order":1
-                },
-                {
-                    "order":11,
-                    "name":"razaosocial",
-                    "label":"Razão social / Nome",
-                    "field-kind":"data",
-                    "required":false,
-                    "visible":true,
-                    "search-visible":true,
-                    "read-only":false,
-                    "persistent?":true,
-                    "data-type":"char",
-                    "alignment":"default",
-                    "default":null,
-                    "size":100,
-                    "width":37,
-                    "lookup-key":"",
-                    "lookup-result":"",
-                    "lookup-filter":"",
-                    "validation":null,
-                    "search-result?":true,
-                    "line-break?":false,
-                    "additional-params":{
-                        
-                    },
-                    "search-result-order":2
-                },
-                {
-                    "order":6,
-                    "name":"cnpj",
-                    "label":"CNPJ",
-                    "field-kind":"data",
-                    "required":false,
-                    "visible":true,
-                    "search-visible":true,
-                    "read-only":false,
-                    "persistent?":true,
-                    "data-type":"char",
-                    "alignment":"default",
-                    "default":null,
-                    "size":20,
-                    "width":17,
-                    "lookup-key":"",
-                    "lookup-result":"",
-                    "lookup-filter":"",
-                    "validation":{
-                        "service":"common_validations",
-                        "method":"cnpj",
-                        "single-argument":null,
-                        "named-arguments":{
-                            
-                        },
-                        "expected-results":{
-                            
-                        },
-                        "show-message-on-error":true,
-                        "before-validate":[
-                            "clear-separators"
-                        ]
-                    },
-                    "search-result?":true,
-                    "line-break?":true,
-                    "additional-params":{
-                        
-                    },
-                    "search-result-order":3,
-                    "mask":"99.999.999/9999-99",
-                    "mask-char":"_",
-                    "format-chars":{
-                        "9":"[0-9]",
-                        "a":"[A-Za-z]",
-                        "A":"[A-Z]",
-                        "*":"[A-Za-z0-9]"
-                    }
-                },
-                {
-                    "order":1,
-                    "name":"id",
-                    "label":"Código",
-                    "field-kind":"data",
-                    "required":false,
-                    "visible":true,
-                    "search-visible":true,
-                    "read-only":false,
-                    "persistent?":true,
-                    "data-type":"integer",
-                    "alignment":"default",
-                    "default":null,
-                    "size":4,
-                    "width":7,
-                    "lookup-key":"",
-                    "lookup-result":"",
-                    "lookup-filter":"",
-                    "validation":null,
-                    "search-result?":true,
-                    "line-break?":false,
-                    "additional-params":{},
-                    "search-result-order":4
                 }
             ]
         }
