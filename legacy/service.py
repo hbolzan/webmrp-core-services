@@ -45,7 +45,7 @@ class LegacyService:
 
     @rpc
     def resolve(self, query):
-        return response.to_response(transaction.query(resolver.to_sql(resolver.resolve(query))))
+        return transaction.query(resolver.to_sql(resolver.resolve(query)))
 
 
     @rpc

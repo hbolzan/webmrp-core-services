@@ -1,8 +1,11 @@
 from nameko.rpc import rpc, RpcProxy
 from .helpers.dynamic_proxy import DynamicRpcProxy
+from .controllers import resolver
+
 
 class NotFound(Exception):
     pass
+
 
 class DataHubService:
     name = "data-hub"
@@ -16,6 +19,13 @@ class DataHubService:
     @rpc
     def get_one(self, provider_name, source, key):
         return self.provider(provider_name).get_one(source, key)
+
+    @rpc
+    def resolve(self, query):
+        return {
+            "status": "OK",
+            "data": resolve(self.provider, query)
+        }
 
     @rpc
     def append(self, provider_name, source, data):

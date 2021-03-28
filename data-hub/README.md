@@ -26,7 +26,8 @@ Query has the following format
             "contatos": [
                 "legacy.fornecedores-contatos",
                 {
-                    "parent": "participante", "order_by": "nome",
+                    "parent": "participante", 
+                    "order_by": "nome",
                     "filter": [{"active": True}],
                 }
             ],
