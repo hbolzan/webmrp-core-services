@@ -6,6 +6,7 @@ from .components.connection import Transaction
 from .controllers import resources
 from .logic import query
 from .logic import response
+from .logic import resolver
 from .legacy_resources import resources_index
 
 
@@ -40,6 +41,12 @@ class LegacyService:
                 order_by=""
             )
         ))
+
+
+    @rpc
+    def resolve(self, query):
+        return response.to_response(transaction.query(resolver.to_sql(resolver.resolve(query))))
+
 
     @rpc
     def append(self, source, data):
