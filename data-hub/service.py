@@ -1,3 +1,6 @@
+import json
+import base64
+
 from nameko.rpc import rpc, RpcProxy
 from .helpers.dynamic_proxy import DynamicRpcProxy
 from .controllers import resolver
@@ -21,7 +24,8 @@ class DataHubService:
         return self.provider(provider_name).get_one(source, key)
 
     @rpc
-    def resolve(self, query):
+    def resolve(self, query_encoded):
+        query = json.loads(base64.b64decode(query_encoded))
         return {
             "status": "OK",
             "data": resolve(self.provider, query)
