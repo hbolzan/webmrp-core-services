@@ -1,7 +1,11 @@
 import functools
 from toolz.dicttoolz import assoc, dissoc
 from toolz.itertoolz import first, second
-from ..logic.resolver import child_to_query
+try:
+    from ..logic.resolver import child_to_query
+except ValueError:
+    from logic.resolver import child_to_query
+
 
 
 def resolve(provider, query):
