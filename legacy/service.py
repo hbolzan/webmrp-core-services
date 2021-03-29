@@ -1,4 +1,5 @@
 import os
+from toolz.itertoolz import first, second
 from urllib import request
 from nameko.rpc import rpc
 from .settings import databases
@@ -6,6 +7,7 @@ from .components.connection import Transaction
 from .controllers import resources
 from .logic import query
 from .logic import response
+from .logic import resolver
 from .legacy_resources import resources_index
 
 
@@ -40,6 +42,21 @@ class LegacyService:
                 order_by=""
             )
         ))
+
+    @rpc
+    def resolve(self, query):
+        return transaction.query(
+            resolver.to_sql(resolver.resolve([self.resolver_source(first(query)), second(query)]))
+        )
+
+    def resolver_source(self, resource_name):
+        return "({}) q0".format(
+            resources.resource_to_sql(
+                ROOT_PATH,
+                resource_name,
+                default_select(resource_name)
+            ).format(where="", order_by="")
+        )
 
     @rpc
     def append(self, source, data):

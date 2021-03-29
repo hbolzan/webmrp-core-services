@@ -1,2 +1,4 @@
 nameko==2.13.0
 psycopg2-binary==2.8.6
+stringcase==1.2.0
+toolz==0.11.1

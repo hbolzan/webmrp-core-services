@@ -57,7 +57,3 @@ def params_to_search_condition(params):
 def from_index(data_index, source_name):
     source = data_index.get(source_name, {"source": source_name, "singular": source_name, "pk": "id"})
     return source.get("source", source_name), source.get("singular", source_name), source.get("pk", "id")
-
-
-if __name__ == '__main__':
-    unittest.main()
