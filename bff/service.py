@@ -43,7 +43,7 @@ class HttpService:
     @cors_http("GET", "/api/data/query")
     def query__get(self, request):
         data_hub = self.services("data-hub")
-        return handle_request(data_hub.resolve(request.args.get("query")))
+        return handle_request(lambda: data_hub.resolve(request.args.get("query")))
 
     @cors_http("GET", "/api/validation/<string:provider>/<string:fn>/<string:value>")
     def validation__get(self, request, provider, fn, value):

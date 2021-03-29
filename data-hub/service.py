@@ -28,7 +28,7 @@ class DataHubService:
         query = json.loads(base64.b64decode(query_encoded))
         return {
             "status": "OK",
-            "data": resolve(self.provider, query)
+            "data": resolver.resolve(self.provider, query)
         }
 
     @rpc
