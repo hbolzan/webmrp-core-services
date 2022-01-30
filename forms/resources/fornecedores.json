@@ -4,6 +4,12 @@
             "id":"cad-fornecedores",
             "dataset-name":"legacy.fornecedores",
             "search-fields":"frn.id,cnpj,cpf,inscricao_estadual,apelido,razaosocial,dados_adicionais,cep,nome_do_logradouro",
+            "search-query": [
+                "legacy.fornecedores",
+                {
+                    "columns": ["id", ""]
+                }
+            ],
             "title":"Cadastro de fornecedores",
             "pk-fields":["id"],
             "auto-pk":true,
