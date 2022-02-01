@@ -36,10 +36,15 @@ class LegacyService:
 
     @rpc
     def get_one(self, resource_name, key):
-        namespace, table_name, pk = query.from_index(resources_index, resource_name)
+        namespace, table_name, query_pk, pk = query.from_index(resources_index, resource_name)
         return response.to_response(transaction.query(
-            resources.resource_to_sql(ROOT_PATH, resource_name, "select", default_select(resource_name)).format(
-                where=query.where("{}={}".format(pk, key)),
+            resources.resource_to_sql(
+                ROOT_PATH,
+                resource_name,
+                "select",
+                default_select(resource_name)
+            ).format(
+                where=query.where("{}={}".format((query_pk or pk), key)),
                 order_by=""
             )
         ))
@@ -69,10 +74,16 @@ class LegacyService:
         pass
 
     @rpc
-    def delete(self, source, key):
+    def delete(self, resource_name, key):
         namespace, table_name, pk = query.from_index(resources_index, resource_name)
-        return response.to_response(transaction.query(
-            resources.resource_to_sql(ROOT_PATH, resource_name, "delete", default_delete(resource_name)).format(
+        sql = resources.resource_to_sql(
+            ROOT_PATH,
+            resource_name,
+            "delete",
+            default_delete(resource_name)
+        ).format(
                 where=query.where("{}={}".format(pk, key)),
-            )
-        ))
+        )
+        print(sql)
+        transaction.execute(sql)
+        return response.to_response({})
