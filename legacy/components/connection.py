@@ -17,6 +17,7 @@ class Transaction:
         try:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
                 c.execute(sql)
+                conn.commit()
                 return c.fetchall() if fetch else None
         except:
             conn.rollback()
