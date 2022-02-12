@@ -13,6 +13,8 @@ from .legacy_resources import resources_index
 
 ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 default_select = lambda resource_name: "select * from {}".format(resource_name) + " {where} {order_by}"
+default_delete = lambda resource_name: "delete from {}".format(resource_name) + " {where}"
+default_edit = lambda resource_name: "update {} set".format(resource_name) + " {fields_set} {where}"
 
 transaction = Transaction(databases["default"])
 
@@ -27,7 +29,7 @@ class LegacyService:
     @rpc
     def query(self, resource_name, params):
         return response.to_response(transaction.query(
-            resources.resource_to_sql(ROOT_PATH, resource_name, default_select(resource_name)).format(
+            resources.resource_to_sql(ROOT_PATH, resource_name, "select", default_select(resource_name)).format(
                 where=query.where(query.params_to_search_condition(params)),
                 order_by=""
             )
@@ -35,10 +37,15 @@ class LegacyService:
 
     @rpc
     def get_one(self, resource_name, key):
-        namespace, table_name, pk = query.from_index(resources_index, resource_name)
+        namespace, table_name, query_pk, pk = query.from_index(resources_index, resource_name)
         return response.to_response(transaction.query(
-            resources.resource_to_sql(ROOT_PATH, resource_name, default_select(resource_name)).format(
-                where=query.where("{}={}".format(pk, key)),
+            resources.resource_to_sql(
+                ROOT_PATH,
+                resource_name,
+                "select",
+                default_select(resource_name)
+            ).format(
+                where=query.where("{}={}".format((query_pk or pk), key)),
                 order_by=""
             )
         ))
@@ -54,6 +61,7 @@ class LegacyService:
             resources.resource_to_sql(
                 ROOT_PATH,
                 resource_name,
+                "select",
                 default_select(resource_name)
             ).format(where="", order_by="")
         )
@@ -63,9 +71,30 @@ class LegacyService:
         pass
 
     @rpc
-    def edit(self, source, key, data):
-        pass
+    def edit(self, resource_name, key, data):
+        namespace, table_name, _, pk = query.from_index(resources_index, resource_name)
+        sql = resources.resource_to_sql(
+            ROOT_PATH,
+            resource_name,
+            "edit",
+            default_edit(resource_name)
+        ).format(
+            fields_set=query.edit_set(data),
+            where=query.where("{} = {}".format(pk, query.maybe_quoted_str(key))),
+        )
+        transaction.execute(sql)
+        return self.get_one(resource_name, key)
 
     @rpc
-    def delete(self, source, key):
-        pass
+    def delete(self, resource_name, key):
+        namespace, table_name, _, pk = query.from_index(resources_index, resource_name)
+        sql = resources.resource_to_sql(
+            ROOT_PATH,
+            resource_name,
+            "delete",
+            default_delete(resource_name)
+        ).format(
+            where=query.where("{} = {}".format(pk, query.maybe_quoted_str(key))),
+        )
+        transaction.execute(sql)
+        return response.to_response({})

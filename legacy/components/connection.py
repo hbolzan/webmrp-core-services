@@ -10,11 +10,15 @@ class Transaction:
         self.conn_fn = lambda : connection.connection(params)
 
     def query(self, sql):
+        return self.execute(sql, True)
+
+    def execute(self, sql, fetch=False):
         conn = self.conn_fn()
         try:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
                 c.execute(sql)
-                return c.fetchall()
+                conn.commit()
+                return c.fetchall() if fetch else None
         except:
             conn.rollback()
             raise

@@ -41,7 +41,7 @@ class DataHubService:
 
     @rpc
     def delete(self, provider_name, source, key):
-        return self.provider(provider_name).delete(source, id, params = {})
+        return self.provider(provider_name).delete(source, key)
 
     def provider(self, service_name):
         try:

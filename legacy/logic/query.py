@@ -56,4 +56,32 @@ def params_to_search_condition(params):
 
 def from_index(data_index, source_name):
     source = data_index.get(source_name, {"source": source_name, "singular": source_name, "pk": "id"})
-    return source.get("source", source_name), source.get("singular", source_name), source.get("pk", "id")
+    return (
+        source.get("source", source_name),
+        source.get("singular", source_name),
+        source.get("query_pk", "id"),
+        source.get("pk", "id")
+    )
+
+
+def is_number(x):
+    t = type(x)
+    return t == int or t == float
+
+
+def single_quoted_str(s):
+    return "'{}'".format(s)
+
+
+def maybe_quoted_str(v):
+    return str(v) if is_number(v) else single_quoted_str(v)
+
+
+def edit_set(payload):
+    return ", ".join(
+        [
+            k + " = " + maybe_quoted_str(v)
+            for (k, v) in payload.items()
+            if k != "__pk__" and k != payload["__pk__"]
+        ]
+    )
