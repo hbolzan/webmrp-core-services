@@ -1,6 +1,6 @@
 from .resources.fornecedores import resource
 resources_index = {
-    "fornecedores": resourece,
+    "fornecedores": resource,
 
     "paises": {
         "source": "nfebase.paises",

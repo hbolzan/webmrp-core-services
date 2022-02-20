@@ -1,5 +1,4 @@
-remove_separators = lambda s: "".join(re.split("\.|\/|-", s))
-
+from ..logic.misc import remove_separators
 
 resource = {
         "source": "fornecedores.select.sql",
