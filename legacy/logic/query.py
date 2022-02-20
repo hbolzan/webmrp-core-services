@@ -84,15 +84,15 @@ def maybe_quoted_str(v):
     return str(v) if is_number(v) else single_quoted_str(v)
 
 
-def with_before_post(resource, k, v):
+def with_before_post(resource, payload, k, v):
     fn = resource.get("before_post", {}).get(k, identity)
-    return fn(v)
+    return fn(payload, v)
 
 
 def edit_set(payload, resource):
     return ", ".join(
         [
-            k + " = " + maybe_quoted_str(with_before_post(resource, k, v))
+            k + " = " + maybe_quoted_str(with_before_post(resource, payload, k, v))
             for (k, v) in payload.items()
             if k != "__pk__" and k != resource.pk and k not in resource["exclude_from_upsert"]
         ]
@@ -101,7 +101,7 @@ def edit_set(payload, resource):
 
 def append_set(payload, resource):
     fields = {
-        k: with_before_post(resource, k, v) for k, v in payload.items()
+        k: with_before_post(resource, payload, k, v) for k, v in payload.items()
         if v is not None and k != resource["pk"] and k not in resource["exclude_from_upsert"]
     }
     return [

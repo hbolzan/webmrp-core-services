@@ -1,4 +1,4 @@
 import re
 
-identity = lambda s: s
-remove_separators = lambda s: "".join(re.split("\.|\/|-", s))
+identity = lambda _, s: s
+remove_separators = lambda _, s: "".join(re.split("\.|\/|-", s))
