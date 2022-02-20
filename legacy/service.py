@@ -15,6 +15,7 @@ ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 default_select = lambda resource_name: "select * from {}".format(resource_name) + " {where} {order_by}"
 default_delete = lambda resource_name: "delete from {}".format(resource_name) + " {where}"
 default_edit = lambda resource_name: "update {} set".format(resource_name) + " {fields_set} {where}"
+default_append = lambda resource_name: "insert into {} ".format(resource_name) + "({fields}) ({values})"
 
 transaction = Transaction(databases["default"])
 
@@ -37,7 +38,7 @@ class LegacyService:
 
     @rpc
     def get_one(self, resource_name, key):
-        namespace, table_name, query_pk, pk = query.from_index(resources_index, resource_name)
+        r = query.from_index(resources_index, resource_name)
         return response.to_response(transaction.query(
             resources.resource_to_sql(
                 ROOT_PATH,
@@ -45,7 +46,7 @@ class LegacyService:
                 "select",
                 default_select(resource_name)
             ).format(
-                where=query.where("{}={}".format((query_pk or pk), key)),
+                where=query.where("{}={}".format((r.query_pk or r.pk), key)),
                 order_by=""
             )
         ))
@@ -67,34 +68,48 @@ class LegacyService:
         )
 
     @rpc
-    def append(self, source, data):
-        pass
+    def append(self, resource_name, data):
+        print(data)
+        r = query.from_index(resources_index, resource_name)
+        fields, values = query.append_set(data.get("data", {}), r)
+        sql = resources.resource_to_sql(
+            ROOT_PATH,
+            resource_name,
+            "append",
+            default_append(resource_name)
+        ).format(fields=", ".join(fields), values=", ".join(values))
+        print(sql)
 
     @rpc
     def edit(self, resource_name, key, data):
-        namespace, table_name, _, pk = query.from_index(resources_index, resource_name)
+        r = query.from_index(resources_index, resource_name)
         sql = resources.resource_to_sql(
             ROOT_PATH,
             resource_name,
             "edit",
             default_edit(resource_name)
         ).format(
-            fields_set=query.edit_set(data),
-            where=query.where("{} = {}".format(pk, query.maybe_quoted_str(key))),
+            fields_set=query.edit_set(data.get("data", {}), r),
+            where=query.where(
+                "{} = {}".format(
+                    data.get("pk", r.pk),
+                    query.maybe_quoted_str(data.get("pkValue", key))
+                )
+            ),
         )
         transaction.execute(sql)
         return self.get_one(resource_name, key)
 
     @rpc
     def delete(self, resource_name, key):
-        namespace, table_name, _, pk = query.from_index(resources_index, resource_name)
+        r = query.from_index(resources_index, resource_name)
         sql = resources.resource_to_sql(
             ROOT_PATH,
             resource_name,
             "delete",
             default_delete(resource_name)
         ).format(
-            where=query.where("{} = {}".format(pk, query.maybe_quoted_str(key))),
+            where=query.where("{} = {}".format(r.pk, query.maybe_quoted_str(key))),
         )
         transaction.execute(sql)
         return response.to_response({})
