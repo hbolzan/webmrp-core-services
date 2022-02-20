@@ -46,7 +46,7 @@ class LegacyService:
                 "select",
                 default_select(resource_name)
             ).format(
-                where=query.where("{}={}".format((r.query_pk or r.get("pk")), key)),
+                where=query.where("{}={}".format((r.get("query_pk", r.get("pk"))), key)),
                 order_by=""
             )
         ))
