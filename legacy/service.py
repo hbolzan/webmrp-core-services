@@ -46,7 +46,7 @@ class LegacyService:
                 "select",
                 default_select(resource_name)
             ).format(
-                where=query.where("{}={}".format((r.query_pk or r.pk), key)),
+                where=query.where("{}={}".format((r.query_pk or r.get("pk")), key)),
                 order_by=""
             )
         ))
@@ -78,7 +78,8 @@ class LegacyService:
             "append",
             default_append(resource_name)
         ).format(fields=", ".join(fields), values=", ".join(values))
-        print(sql)
+        pk_value = first(transaction.query(sql)).get(data.get("pk", r.get("pk")))
+        return self.get_one(resource_name, pk_value)
 
     @rpc
     def edit(self, resource_name, key, data):
@@ -92,7 +93,7 @@ class LegacyService:
             fields_set=query.edit_set(data.get("data", {}), r),
             where=query.where(
                 "{} = {}".format(
-                    data.get("pk", r.pk),
+                    data.get("pk", r.get("pk")),
                     query.maybe_quoted_str(data.get("pkValue", key))
                 )
             ),
@@ -109,7 +110,7 @@ class LegacyService:
             "delete",
             default_delete(resource_name)
         ).format(
-            where=query.where("{} = {}".format(r.pk, query.maybe_quoted_str(key))),
+            where=query.where("{} = {}".format(r.get("pk"), query.maybe_quoted_str(key))),
         )
         transaction.execute(sql)
         return response.to_response({})
