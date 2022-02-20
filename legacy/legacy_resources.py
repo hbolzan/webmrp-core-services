@@ -1,10 +1,16 @@
+from .resources.fornecedores import resource
 resources_index = {
-    "fornecedores": {
-        "source": "fornecedores.select.sql",
-        "singular": "fornecedor",
-        "pk": "id",
-        "query_pk": "frn.id",
+    "fornecedores": resource,
+
+    "paises": {
+        "source": "nfebase.paises",
+        "singular": "país",
+        "pk": "codigo"
     },
-    "paises": {"source": "nfebase.paises", "singular": "país", "pk": "codigo"},
-    "municipios": {"source": "nfebase.ibge_municipios_reduzida", "singular": "municipio", "pk": "municipiocodigo"},
+
+    "municipios": {
+        "source": "nfebase.ibge_municipios_reduzida",
+        "singular": "municipio",
+        "pk": "municipiocodigo"
+    },
 }

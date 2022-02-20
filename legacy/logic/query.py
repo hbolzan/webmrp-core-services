@@ -1,3 +1,5 @@
+from .misc import identity
+
 def select(root_path, resource_name, condition="", order=""):
     try:
         return resource_select(root_path, resource_name, condition, order)
@@ -54,14 +56,19 @@ def params_to_search_condition(params):
     return search_filter or search_condition
 
 
-def from_index(data_index, source_name):
-    source = data_index.get(source_name, {"source": source_name, "singular": source_name, "pk": "id"})
-    return (
-        source.get("source", source_name),
-        source.get("singular", source_name),
-        source.get("query_pk", "id"),
-        source.get("pk", "id")
+def from_index(resources_index, source_name):
+    source = resources_index.get(
+        source_name,
+        {"source": source_name, "singular": source_name, "pk": "id"}
     )
+    return {
+        "source": source.get("source", source_name),
+        "singular": source.get("singular", source_name),
+        "query_pk": source.get("query_pk", "id"),
+        "pk": source.get("pk", "id"),
+        "exclude_from_upsert": source.get("exclude_from_upsert", []),
+        "before_post": source.get("before_post", {}),
+    }
 
 
 def is_number(x):
@@ -77,11 +84,27 @@ def maybe_quoted_str(v):
     return str(v) if is_number(v) else single_quoted_str(v)
 
 
-def edit_set(payload):
+def with_before_post(resource, payload, k, v):
+    fn = resource.get("before_post", {}).get(k, identity)
+    return fn(payload, v)
+
+
+def edit_set(payload, resource):
     return ", ".join(
         [
-            k + " = " + maybe_quoted_str(v)
+            k + " = " + maybe_quoted_str(with_before_post(resource, payload, k, v))
             for (k, v) in payload.items()
-            if k != "__pk__" and k != payload["__pk__"]
+            if k != "__pk__" and k != resource.pk and k not in resource["exclude_from_upsert"]
         ]
     )
+
+
+def append_set(payload, resource):
+    fields = {
+        k: with_before_post(resource, payload, k, v) for k, v in payload.items()
+        if v is not None and k != resource["pk"] and k not in resource["exclude_from_upsert"]
+    }
+    return [
+        fields.keys(),
+        [maybe_quoted_str(v) for v in fields.values()],
+    ]
